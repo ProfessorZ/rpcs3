@@ -362,12 +362,11 @@ template <>
 void fmt_class_string<fmt::buf_to_hexstring>::format(std::string& out, u64 arg)
 {
 	const auto& _arg = get_object(arg);
-	const std::vector<u8> buf(_arg.buf, _arg.buf + _arg.len);
-	out.reserve(out.size() + (buf.size() * 3));
+	out.reserve(out.size() + (_arg.len * 3));
 	static constexpr char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 	const bool use_linebreak = _arg.line_length > 0;
 
-	for (usz index = 0; index < buf.size(); index++)
+	for (usz index = 0; index < _arg.len; index++)
 	{
 		if (index > 0)
 		{
@@ -380,8 +379,8 @@ void fmt_class_string<fmt::buf_to_hexstring>::format(std::string& out, u64 arg)
 		if (_arg.with_prefix)
 			out += "0x";
 
-		out += hex[buf[index] >> 4];
-		out += hex[buf[index] & 15];
+		out += hex[_arg.buf[index] >> 4];
+		out += hex[_arg.buf[index] & 15];
 	}
 }
 
