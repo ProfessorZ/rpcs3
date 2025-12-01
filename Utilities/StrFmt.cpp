@@ -392,24 +392,32 @@ void format_byte_array(std::string& out, const uchar* data, usz size)
 		return;
 	}
 
+	// Reserve space: "{ " + (size * 3 for "XX ") + extra for ", " every 4 bytes + " }"
+	out.reserve(out.size() + 4 + size * 3 + (size / 4));
+
+	static constexpr char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
 	out += "{ ";
 
 	for (usz i = 0;; i++)
 	{
+		out += hex[data[i] >> 4];
+		out += hex[data[i] & 15];
+
 		if (i == size - 1)
 		{
-			fmt::append(out, "%02X", data[i]);
 			break;
 		}
 
 		if ((i % 4) == 3)
 		{
 			// Place a comma each 4 bytes for ease of byte placement finding
-			fmt::append(out, "%02X, ", data[i]);
-			continue;
+			out += ", ";
 		}
-
-		fmt::append(out, "%02X ", data[i]);
+		else
+		{
+			out += ' ';
+		}
 	}
 
 	out += " }";
