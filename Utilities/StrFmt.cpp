@@ -392,8 +392,8 @@ void format_byte_array(std::string& out, const uchar* data, usz size)
 		return;
 	}
 
-	// Reserve space: "{ " + (size * 3 for "XX ") + extra for ", " every 4 bytes + " }"
-	out.reserve(out.size() + 4 + size * 3 + (size / 4));
+	// Reserve space: "{ " (2) + size * 2 hex chars + (size - 1) separators (at most 2 chars each) + " }" (2)
+	out.reserve(out.size() + 4 + size * 2 + (size - 1) * 2);
 
 	static constexpr char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
