@@ -73,7 +73,7 @@ namespace rsx
 		// List of sections that have been wholly inherited and invalidated
 		std::vector<surface_type> superseded_surfaces;
 
-		std::list<surface_storage_type> invalidated_resources;
+		std::deque<surface_storage_type> invalidated_resources;
 		const u64 max_invalidated_resources_count = 256ull;
 		u64 cache_tag = 1ull; // Use 1 as the start since 0 is default tag on new surfaces
 		u64 write_tag = 1ull;

@@ -68,6 +68,14 @@ namespace rsx
 			address_range32 fault_range;
 			address_range32 invalidate_range;
 
+			thrashed_set()
+			{
+				// Pre-allocate capacity to eliminate most reallocations during page fault handling
+				sections_to_flush.reserve(16);
+				sections_to_unprotect.reserve(16);
+				sections_to_exclude.reserve(8);
+			}
+
 			void clear_sections()
 			{
 				sections_to_flush = {};
