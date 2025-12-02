@@ -112,6 +112,9 @@ private:
 	vk::command_buffer_chain<VK_MAX_ASYNC_CB_COUNT> m_primary_cb_list;
 	vk::command_buffer_chunk* m_current_command_buffer = nullptr;
 
+	// Track currently bound pipeline to avoid redundant rebinds
+	VkPipeline m_currently_bound_pipeline = VK_NULL_HANDLE;
+
 	std::unique_ptr<vk::buffer> m_host_object_data;
 	vk::framebuffer_holder* m_draw_fbo = nullptr;
 
