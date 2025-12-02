@@ -132,6 +132,10 @@ namespace vk
 			rsx::simple_array<VkDescriptorPoolSize> m_descriptor_pool_sizes;
 			rsx::simple_array<VkDescriptorType> m_descriptor_types;
 
+			// Descriptor set recycling pool for per-frame reuse
+			std::vector<VkDescriptorSet> m_descriptor_set_pool;
+			u32 m_pool_index = 0;
+
 			u32 m_descriptor_template_typemask = 0u;
 			rsx::simple_array<VkWriteDescriptorSet> m_descriptor_template;
 			u64 m_descriptor_template_cache_id = umax;
