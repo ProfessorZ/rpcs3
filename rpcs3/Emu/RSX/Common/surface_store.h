@@ -6,6 +6,7 @@
 #include "surface_cache_dma.hpp"
 #include "../gcm_enums.h"
 #include "../rsx_utils.h"
+#include <deque>
 #include <list>
 
 #include "util/asm.hpp"
