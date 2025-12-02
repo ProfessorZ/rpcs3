@@ -332,9 +332,27 @@ struct atomic_storage
 #endif
 	}
 
+	static inline T load_acquire(const T& dest)
+	{
+#ifdef __clang__
+		type result;
+		__atomic_load(reinterpret_cast<const type*>(&dest), MAYBE_CAST(&result), __ATOMIC_ACQUIRE);
+		return std::bit_cast<T>(result);
+#else
+		alignas(sizeof(T)) T result;
+		__atomic_load(&dest, &result, __ATOMIC_ACQUIRE);
+		return result;
+#endif
+	}
+
 	static inline void store(T& dest, T value)
 	{
 		static_cast<void>(exchange(dest, value));
+	}
+
+	static inline void store_relaxed(T& dest, T value)
+	{
+		__atomic_store(MAYBE_CAST(&dest), MAYBE_CAST(&value), __ATOMIC_RELAXED);
 	}
 
 	static inline void release(T& dest, T value)
@@ -580,11 +598,23 @@ struct atomic_storage<T, 1> : atomic_storage<T, 0>
 		return std::bit_cast<T>(value);
 	}
 
+	static inline T load_acquire(const T& dest)
+	{
+		const char value = *reinterpret_cast<const volatile char*>(&dest);
+		atomic_fence_acquire();
+		return std::bit_cast<T>(value);
+	}
+
 	static inline void release(T& dest, T value)
 	{
 		atomic_fence_release();
 		*reinterpret_cast<volatile char*>(&dest) = std::bit_cast<char>(value);
 		atomic_fence_release();
+	}
+
+	static inline void store_relaxed(T& dest, T value)
+	{
+		*reinterpret_cast<volatile char*>(&dest) = std::bit_cast<char>(value);
 	}
 
 	static inline T exchange(T& dest, T value)
@@ -650,11 +680,23 @@ struct atomic_storage<T, 2> : atomic_storage<T, 0>
 		return std::bit_cast<T>(value);
 	}
 
+	static inline T load_acquire(const T& dest)
+	{
+		const short value = *reinterpret_cast<const volatile short*>(&dest);
+		atomic_fence_acquire();
+		return std::bit_cast<T>(value);
+	}
+
 	static inline void release(T& dest, T value)
 	{
 		atomic_fence_release();
 		*reinterpret_cast<volatile short*>(&dest) = std::bit_cast<short>(value);
 		atomic_fence_release();
+	}
+
+	static inline void store_relaxed(T& dest, T value)
+	{
+		*reinterpret_cast<volatile short*>(&dest) = std::bit_cast<short>(value);
 	}
 
 	static inline T exchange(T& dest, T value)
@@ -740,11 +782,23 @@ struct atomic_storage<T, 4> : atomic_storage<T, 0>
 		return std::bit_cast<T>(value);
 	}
 
+	static inline T load_acquire(const T& dest)
+	{
+		const long value = *reinterpret_cast<const volatile long*>(&dest);
+		atomic_fence_acquire();
+		return std::bit_cast<T>(value);
+	}
+
 	static inline void release(T& dest, T value)
 	{
 		atomic_fence_release();
 		*reinterpret_cast<volatile long*>(&dest) = std::bit_cast<long>(value);
 		atomic_fence_release();
+	}
+
+	static inline void store_relaxed(T& dest, T value)
+	{
+		*reinterpret_cast<volatile long*>(&dest) = std::bit_cast<long>(value);
 	}
 
 	static inline T exchange(T& dest, T value)
@@ -836,11 +890,23 @@ struct atomic_storage<T, 8> : atomic_storage<T, 0>
 		return std::bit_cast<T>(value);
 	}
 
+	static inline T load_acquire(const T& dest)
+	{
+		const llong value = *reinterpret_cast<const volatile llong*>(&dest);
+		atomic_fence_acquire();
+		return std::bit_cast<T>(value);
+	}
+
 	static inline void release(T& dest, T value)
 	{
 		atomic_fence_release();
 		*reinterpret_cast<volatile llong*>(&dest) = std::bit_cast<llong>(value);
 		atomic_fence_release();
+	}
+
+	static inline void store_relaxed(T& dest, T value)
+	{
+		*reinterpret_cast<volatile llong*>(&dest) = std::bit_cast<llong>(value);
 	}
 
 	static inline T exchange(T& dest, T value)
@@ -1315,6 +1381,12 @@ public:
 		return atomic_storage<type>::observe(m_data);
 	}
 
+	// Load with acquire memory order (ensures following loads/stores aren't reordered before this)
+	type load_acquire() const
+	{
+		return atomic_storage<type>::load_acquire(m_data);
+	}
+
 	// Atomically write data
 	void store(const type& rhs)
 	{
@@ -1331,6 +1403,12 @@ public:
 	void release(const type& rhs)
 	{
 		atomic_storage<type>::release(m_data, rhs);
+	}
+
+	// Store with relaxed memory order (no synchronization, just atomicity)
+	void store_relaxed(const type& rhs)
+	{
+		atomic_storage<type>::store_relaxed(m_data, rhs);
 	}
 
 	// Atomically replace data with value, return previous data value
