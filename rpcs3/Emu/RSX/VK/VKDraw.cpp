@@ -861,8 +861,13 @@ void VKGSRender::emit_geometry(u32 sub_index)
 	});
 
 	// Bind both pipe and descriptors in one go
-	// FIXME: We only need to rebind the pipeline when reload state is set. Flags?
-	m_program->bind(*m_current_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS);
+	// Only rebind pipeline if it has changed or state was reloaded
+	const VkPipeline current_pipeline = m_program->value();
+	if (reload_state || current_pipeline != m_currently_bound_pipeline)
+	{
+		m_program->bind(*m_current_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS);
+		m_currently_bound_pipeline = current_pipeline;
+	}
 
 	if (reload_state)
 	{
