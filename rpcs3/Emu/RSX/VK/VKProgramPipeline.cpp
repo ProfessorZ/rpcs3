@@ -619,8 +619,8 @@ namespace vk
 			else
 			{
 				// Pool is full - cycle through existing sets
-				m_pool_index = (m_pool_index + 1) % pool_size;
 				m_descriptor_set = m_descriptor_set_pool[m_pool_index];
+				m_pool_index = (m_pool_index + 1) % pool_size;
 			}
 
 			if (!m_descriptor_template.empty()) [[ likely ]]
