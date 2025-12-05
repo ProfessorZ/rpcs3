@@ -434,10 +434,6 @@ namespace vk
 				m_descriptor_pool.reset();
 			}
 
-			// Clear recycling pool (descriptor sets are freed by pool destruction)
-			m_descriptor_set_pool.clear();
-			m_pool_index = 0;
-
 			m_device = VK_NULL_HANDLE;
 		}
 
@@ -605,9 +601,7 @@ namespace vk
 				return m_descriptor_set.value();
 			}
 
-			// Always allocate a new descriptor set when descriptors are dirty.
-			VkDescriptorSet new_set = allocate_descriptor_set();
-			m_descriptor_set = new_set;
+			m_descriptor_set = allocate_descriptor_set();
 			if (!m_descriptor_template.empty()) [[ likely ]]
 			{
 				// Run pointer updates. Optimized for cached back-to-back updates which are quite frequent.
