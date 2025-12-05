@@ -71,7 +71,7 @@ namespace rsx
 		// List of sections derived from a section that has been split and invalidated
 		std::vector<std::pair<u32, surface_type>> orphaned_surfaces;
 
-			// List of sections that have been wholly inherited and invalidated
+		// List of sections that have been wholly inherited and invalidated
 		std::vector<surface_type> superseded_surfaces;
 
 		std::deque<surface_storage_type> invalidated_resources;
