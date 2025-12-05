@@ -605,24 +605,9 @@ namespace vk
 				return m_descriptor_set.value();
 			}
 
-			// Descriptor set recycling: Reuse sets from a per-frame pool to avoid constant allocations
-			// Pool size of 4 provides enough sets for VK_MAX_ASYNC_FRAMES=2 with frame overlap
-			constexpr u32 pool_size = 4;
-
-			if (m_descriptor_set_pool.size() < pool_size)
-			{
-				// Pool not yet full - allocate new set and add to pool
-				VkDescriptorSet new_set = allocate_descriptor_set();
-				m_descriptor_set_pool.push_back(new_set);
-				m_descriptor_set = new_set;
-			}
-			else
-			{
-				// Pool is full - cycle through existing sets
-				m_pool_index = (m_pool_index + 1) % pool_size;
-				m_descriptor_set = m_descriptor_set_pool[m_pool_index];
-			}
-
+			// Always allocate a new descriptor set when descriptors are dirty.
+			VkDescriptorSet new_set = allocate_descriptor_set();
+			m_descriptor_set = new_set;
 			if (!m_descriptor_template.empty()) [[ likely ]]
 			{
 				// Run pointer updates. Optimized for cached back-to-back updates which are quite frequent.
