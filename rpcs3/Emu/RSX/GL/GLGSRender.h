@@ -7,6 +7,7 @@
 #include "GLShaderInterpreter.h"
 #include "Emu/RSX/rsx_cache.h"
 
+#include <deque>
 #include <optional>
 #include <unordered_map>
 #include <thread>
@@ -127,7 +128,7 @@ class GLGSRender : public GSRender, public ::rsx::reports::ZCULL_control
 	gl::video_out_calibration_pass m_video_output_pass;
 
 	shared_mutex queue_guard;
-	std::list<gl::work_item> work_queue;
+	std::deque<gl::work_item> work_queue;
 
 	GLProgramBuffer m_prog_buffer;
 

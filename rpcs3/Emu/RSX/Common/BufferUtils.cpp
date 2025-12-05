@@ -461,18 +461,41 @@ namespace
 	void iota16(u16* dst, u32 count)
 	{
 		unsigned i = 0;
-#if defined(ARCH_X64) || defined(ARCH_ARM64)
-		const unsigned step = 8;                          // We do 8 entries per step
-		const __m128i vec_step = _mm_set1_epi16(8);     // Constant to increment the raw values
-		__m128i values = _mm_set_epi16(7, 6, 5, 4, 3, 2, 1, 0);
-		__m128i* vec_ptr = utils::bless<__m128i>(dst);
 
-		for (; (i + step) <= count; i += step, vec_ptr++)
+#if defined(__AVX2__)
+		// AVX2 path - process 16 elements at once
 		{
-			_mm_stream_si128(vec_ptr, values);
-			_mm_add_epi16(values,  vec_step);
+			const unsigned step = 16;
+			const __m256i vec_step = _mm256_set1_epi16(16);
+			__m256i values = _mm256_set_epi16(15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+			__m256i* vec_ptr = utils::bless<__m256i>(dst);
+
+			for (; (i + step) <= count; i += step, vec_ptr++)
+			{
+				_mm256_stream_si256(vec_ptr, values);
+				values = _mm256_add_epi16(values, vec_step);
+			}
 		}
 #endif
+
+#if defined(ARCH_X64) || defined(ARCH_ARM64)
+		// SSE2/NEON path - process 8 elements at once
+		{
+			const unsigned step = 8;
+			const __m128i vec_step = _mm_set1_epi16(8);
+			__m128i values = _mm_set_epi16(7, 6, 5, 4, 3, 2, 1, 0);
+			values = _mm_add_epi16(values, _mm_set1_epi16(i)); // Offset by already processed
+			__m128i* vec_ptr = utils::bless<__m128i>(dst + i);
+
+			for (; (i + step) <= count; i += step, vec_ptr++)
+			{
+				_mm_stream_si128(vec_ptr, values);
+				values = _mm_add_epi16(values, vec_step); // FIXED: Store result
+			}
+		}
+#endif
+
+		// Scalar remainder
 		for (; i < count; ++i)
 			dst[i] = i;
 	}

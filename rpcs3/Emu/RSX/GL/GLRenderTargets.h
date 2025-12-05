@@ -455,7 +455,7 @@ struct gl_render_targets : public rsx::surface_store<gl_render_target_traits>
 		run_cleanup_internal(cmd, rsx::problem_severity::moderate, 256, [](gl::command_context&) {});
 
 		std::vector<GLuint> removed;
-		invalidated_resources.remove_if([&](auto &rtt)
+		std::erase_if(invalidated_resources, [&](auto &rtt)
 		{
 			if (rtt->unused_check_count() >= 2)
 			{
