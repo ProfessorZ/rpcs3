@@ -4,6 +4,7 @@
 #include "Utilities/lockless.h"
 #include "Utilities/address_range.h"
 #include "SPUThread.h"
+#include "3rdparty/unordered_dense/include/unordered_dense.h"
 #include <vector>
 #include <bitset>
 #include <memory>
@@ -291,10 +292,10 @@ protected:
 	std::bitset<0x10000> m_use_rc;
 
 	// List of possible targets for the instruction (entry shouldn't exist for simple instructions)
-	std::unordered_map<u32, std::vector<u32>, value_hash<u32, 2>> m_targets;
+	ankerl::unordered_dense::map<u32, std::vector<u32>, value_hash<u32, 2>> m_targets;
 
 	// List of block predecessors
-	std::unordered_map<u32, std::vector<u32>, value_hash<u32, 2>> m_preds;
+	ankerl::unordered_dense::map<u32, std::vector<u32>, value_hash<u32, 2>> m_preds;
 
 	// List of function entry points and return points (set after BRSL, BRASL, BISL, BISLED)
 	std::bitset<0x10000> m_entry_info;
@@ -400,7 +401,7 @@ protected:
 		u64 info;
 	};
 
-	std::unordered_map<u32, pattern_info> m_patterns;
+	ankerl::unordered_dense::map<u32, pattern_info> m_patterns;
 
 	void add_pattern(inst_attr attr, u32 start, u64 info);
 
