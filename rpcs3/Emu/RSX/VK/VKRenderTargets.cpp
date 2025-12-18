@@ -237,7 +237,7 @@ namespace vk
 			}
 		}
 
-		invalidated_resources.remove_if(
+		std::erase_if(invalidated_resources,
 			[](auto& rtt) { return !rtt; }
 		);
 	}

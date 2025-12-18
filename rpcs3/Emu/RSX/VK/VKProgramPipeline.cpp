@@ -602,7 +602,6 @@ namespace vk
 			}
 
 			m_descriptor_set = allocate_descriptor_set();
-
 			if (!m_descriptor_template.empty()) [[ likely ]]
 			{
 				// Run pointer updates. Optimized for cached back-to-back updates which are quite frequent.

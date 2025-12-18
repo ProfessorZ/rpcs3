@@ -1271,7 +1271,7 @@ void GLGSRender::do_local_task(rsx::FIFO::state state)
 	{
 		std::lock_guard lock(queue_guard);
 
-		work_queue.remove_if([](auto &q) { return q.received; });
+		std::erase_if(work_queue, [](auto &q) { return q.received; });
 
 		for (auto& q : work_queue)
 		{
