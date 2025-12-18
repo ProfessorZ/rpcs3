@@ -487,6 +487,7 @@ VKGSRender::VKGSRender(utils::serial* ar) noexcept : GSRender(ar)
 	m_command_buffer_pool.create((*m_device), m_device->get_graphics_queue_family());
 	m_primary_cb_list.create(m_command_buffer_pool, vk::command_buffer::access_type_hint::flush_only);
 	m_current_command_buffer = m_primary_cb_list.get();
+	m_currently_bound_pipeline = VK_NULL_HANDLE;
 	m_current_command_buffer->begin();
 
 	// Create secondary command_buffer for parallel operations
@@ -1518,6 +1519,7 @@ void VKGSRender::flush_command_queue(bool hard_sync, bool do_not_switch)
 		// Grab next cb in line and make it usable
 		// NOTE: Even in the case of a hard sync, this is required to free any waiters on the CB (ZCULL)
 		m_current_command_buffer = m_primary_cb_list.next();
+		m_currently_bound_pipeline = VK_NULL_HANDLE;
 		m_current_command_buffer->reset();
 	}
 	else
