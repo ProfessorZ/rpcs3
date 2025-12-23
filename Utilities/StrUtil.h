@@ -62,7 +62,7 @@ namespace fmt
 					continue;
 				}
 
-				if (src.substr(pos, comp_length) == list[i].first)
+				if (src.compare(pos, comp_length, list[i].first.data(), comp_length) == 0)
 				{
 					src.erase(pos, comp_length);
 					src.insert(pos, list[i].second.data(), list[i].second.length());
@@ -92,7 +92,7 @@ namespace fmt
 					continue;
 				}
 
-				if (src.substr(pos, comp_length) == list[i].first)
+				if (src.compare(pos, comp_length, list[i].first.data(), comp_length) == 0)
 				{
 					src.erase(pos, comp_length);
 					auto replacement = list[i].second();
@@ -123,7 +123,7 @@ namespace fmt
 					continue;
 				}
 
-				if (src.substr(pos, comp_length) == list[i].first)
+				if (src.compare(pos, comp_length, list[i].first.data(), comp_length) == 0)
 				{
 					src.erase(pos, comp_length);
 					src.insert(pos, list[i].second);
